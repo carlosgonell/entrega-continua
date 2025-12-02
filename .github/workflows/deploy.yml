@@ -26,7 +26,7 @@ jobs:
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/entrega-continua:latest
 
       - name: Deploy to Render
-        uses: render-oss/render-action@v1
+        uses: render-oss/actions/deploy@v1
         with:
           service-id: ${{ secrets.RENDER_SERVICE_ID }}
           api-key: ${{ secrets.RENDER_API_KEY }}

@@ -2,8 +2,7 @@ name: Build, Push Docker Image and Deploy to Render
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
@@ -13,10 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up variables
+      - name: Check if secrets are loaded
         run: |
-          echo "SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+          if [ -z "${{ secrets.DOCKER_USERNAME }}" ]; then echo "USERNAME EMPTY"; else echo "USERNAME OK"; fi
+          if [ -z "${{ secrets.DOCKER_PASSWORD }}" ]; then echo "PASSWORD EMPTY"; else echo "PASSWORD OK"; fi
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -25,12 +24,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/miapp:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/miapp:latest .
 
       - name: Push Docker image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/miapp:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/miapp:latest
 
       - name: Trigger Render deploy
         run: |
